@@ -6,7 +6,9 @@ class BotDB:
         """Создание соединения с БД"""
         self.conn = sqlite3.connect(db_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
-        print('Проинициализировал класс!')
+        self.cursor.execute('PRAGMA foreign_keys = ON')
+        self.conn.commit()
+        print('Соединился с базой, едем дальше')
 
     def user_exists(self, user_id):
         """Проверяем есть ли юзер в БД"""
@@ -14,8 +16,13 @@ class BotDB:
         return bool(len(result.fetchall()))
 
     def get_users(self):
-        """Вытаскиваем всех пользователей из БД"""
+        """Вытаскиваем все user_id пользователей из БД"""
         result = self.cursor.execute('SELECT "user_id" FROM users')    
+        return result.fetchall()
+
+    def get_usernames(self):
+        """Вытаскиваем все username пользователей из БД"""
+        result = self.cursor.execute('SELECT "username" FROM users')    
         return result.fetchall()
 
     def add_user(self, user_id, username):
@@ -60,6 +67,11 @@ class BotDB:
     def complain_stataus(self,user_id):
         """Узнаём статус жалобы для пользователя"""
         result = self.cursor.execute('SELECT "is_complained" FROM "users" WHERE "user_id"=?', (user_id,))
-        return True if result.fetchone()[0] == 1 else False     
+        return True if result.fetchone()[0] == 1 else False 
+    def delete_user(self, username):
+        """Удаляем пользователя из БД"""
+        self.cursor.execute('DELETE FROM "users" WHERE "username"=?',(username,))
+        return self.conn.commit()
+
 
     
