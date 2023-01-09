@@ -64,14 +64,30 @@ class BotDB:
         """Удаляем статус жалобы для пользователя"""
         self.cursor.execute('UPDATE users SET "is_complained"=0 WHERE "user_id"=?', (user_id,))
         return self.conn.commit()  
-    def complain_stataus(self,user_id):
-        """Узнаём статус жалобы для пользователя"""
-        result = self.cursor.execute('SELECT "is_complained" FROM "users" WHERE "user_id"=?', (user_id,))
+    def public_message_status(self,user_id):
+        """Узнаём статус публичного сообщения для пользователя"""
+        result = self.cursor.execute('SELECT "public_message" FROM "users" WHERE "user_id"=?', (user_id,))
         return True if result.fetchone()[0] == 1 else False 
     def delete_user(self, username):
         """Удаляем пользователя из БД"""
         self.cursor.execute('DELETE FROM "users" WHERE "username"=?',(username,))
         return self.conn.commit()
+
+    def set_public(self,user_id):
+        """Устанавливаем что пользователь хочет написать публичное сообщение"""
+        self.cursor.execute('UPDATE users SET "public_message"=1 WHERE "user_id"=?', (user_id,))
+        return self.conn.commit()    
+
+    def reset_public(self,user_id):
+        """Удаляем что пользователь хочет написать публичное сообщение"""
+        self.cursor.execute('UPDATE users SET "public_message"=0 WHERE "user_id"=?', (user_id,))
+        return self.conn.commit() 
+
+    def get_all_payments(self):
+        """Все платежи в базе на текущий момент"""
+        result = self.cursor.execute('SELECT users.username, payments.amount, payments.timestamp FROM "users" JOIN "payments" ON users.user_id=payments.user_id')
+        return result.fetchall() 
+
 
 
     
