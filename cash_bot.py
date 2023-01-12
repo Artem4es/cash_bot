@@ -161,7 +161,7 @@ def sum_recognition(update, context):
 def reset_sum(update, context):
     all_users = [user[0] for user in (db.get_users())]
     db.reset_sum()
-    db.set_user_owes
+    db.set_user_owes()
     name = update.message.chat.first_name
     message = f'Сумма обнулена пользвателем {name}💪'
     for chat_id in all_users:
