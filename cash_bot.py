@@ -9,9 +9,6 @@ import logging
 from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Bot
 
-print(sys.path)
-
-
 from db import BotDB
 db = BotDB('telebot.db')
 
