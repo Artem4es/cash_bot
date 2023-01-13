@@ -13,6 +13,9 @@ from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Bot
 print(sys.path)
 
 
+print(sys.path)
+
+
 from db import BotDB
 from models import User
 db = BotDB('telebot.db')
@@ -37,17 +40,13 @@ def wake_up(update, context):
         message = f'Привет, {name}! У ты тут не первый и возможно уже были платежи (сумму можно посмотреть в меню). Выбери что делать, пожалуйста!'
         send_message(context, chat.id, message, reply_markup=reply_markup)
         return
-        db.add_user(user_id, username)  # дата расчётов по умолчанию дата регистрации
-        reply_markup = ReplyKeyboardMarkup(keyboard=[['Поделить всё с момента регистрации первого участника'],['Считать мой долг с текущей даты']], resize_keyboard=True)
-        message = f'Привет, {name}! У ты тут не первый и возможно уже были платежи (сумму можно посмотреть в меню). Выбери что делать, пожалуйста!'
-        send_message(context, chat.id, message, reply_markup=reply_markup)
-        return
 
     text = f'Привет, {name}! Напиши циферками заплаченную сумму👋'
     send_message(context, chat.id, text, reply_markup=ReplyKeyboardRemove())
     send_message(context, chat.id, text, reply_markup=ReplyKeyboardRemove())
 
 
+def calculation(update, context, amount=None):
 def calculation(update, context, amount=None):
     user_id = context._user_id_and_data[0]
     name = update.effective_chat.username
@@ -61,15 +60,14 @@ def calculation(update, context, amount=None):
         user_id, username, pays_since = db.get_user_data(user_id)
         user_info[username] = [user_id, pays_since]
         
-    for user_id in all_users:
-        user_id, username, pays_since = db.get_user_data(user_id)
-        user_info[username] = [user_id, pays_since]
-        
 
     user_id = context._user_id_and_data[0]
     if amount is not None:
         db.add_sum(user_id, amount)
         message = f'Ребятки, {name}😎 только что заплатил {amount}'
+        if len(all_users) == 1:
+            message = f'{name} ты пока один в чатике и должен сам себе)'
+            return send_message(context=context, chat_id=user_id, text=message)
         if len(all_users) == 1:
             message = f'{name} ты пока один в чатике и должен сам себе)'
             return send_message(context=context, chat_id=user_id, text=message)
@@ -86,7 +84,6 @@ def calculation(update, context, amount=None):
     for i in range(period_qty):
 
         since = user_info[list(user_info)[i+1]][1]
-
         until = str(datetime.datetime.now())
         if not i == (period_qty-1):
             until = user_info[list(user_info)[i+2]][1]
@@ -109,9 +106,15 @@ def calculation(update, context, amount=None):
     for user, owes in user_owes_dict.items():
         if owes < 0:
             message = f'С тебя {abs(owes)} тугриков🤸🏻‍♂️'
+            message = f'С тебя {abs(owes)} тугриков🤸🏻‍♂️'
         elif owes > 0:
             message = f'👍Ты в плюсе на {owes} тугриков' 
+            message = f'👍Ты в плюсе на {owes} тугриков' 
         else:
+            message = 'Вот это да, ты в нулину!🥳'
+        user_id = user_info[user][0]
+        send_message(context, user_id, message)
+        db.set_user_owes(user_id, owes)
             message = 'Вот это да, ты в нулину!🥳'
         user_id = user_info[user][0]
         send_message(context, user_id, message)
@@ -119,6 +122,7 @@ def calculation(update, context, amount=None):
 
 
 
+def how_much(update, context): # Cделать обновление
 def how_much(update, context): # Cделать обновление
     calculation(update, context)
 
@@ -143,9 +147,14 @@ def sum_recognition(update, context):
                 return
 
             elif message == 'Поделить всё с момента регистрации первого участника':
+            elif message == 'Поделить всё с момента регистрации первого участника':
                 db.set_pays_since(user_id)
                 return send_message(context, chat_id, 'Окей!Считаем от истоков)', reply_markup=ReplyKeyboardRemove())  # в будущем добавить дату с которой
+                return send_message(context, chat_id, 'Окей!Считаем от истоков)', reply_markup=ReplyKeyboardRemove())  # в будущем добавить дату с которой
 
+            elif message == 'Считать мой долг с текущей даты':
+                pays_since = datetime.datetime.now()
+                db.set_pays_since(user_id, pays_since)
             elif message == 'Считать мой долг с текущей даты':
                 pays_since = datetime.datetime.now()
                 db.set_pays_since(user_id, pays_since)
