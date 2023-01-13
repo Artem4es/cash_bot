@@ -49,7 +49,11 @@ class BotDB:
 
     def add_sum(self, user_id, amount):
         """Добавляем суммуи user_id в таблицу payments"""
-        self.cursor.execute('INSERT INTO payments ("user_id", "amount") VALUES(?, ?);',(user_id, amount))
+        try:
+            self.cursor.execute('INSERT INTO payments ("user_id", "amount") VALUES(?, ?);',(user_id, amount))
+        except Exception as error:
+            # logger.error(f'{error} Не удалось записать данные о платеже')
+            raise error('Не удалось записать данные о платеже')
         return self.conn.commit()        
 
 
@@ -119,12 +123,14 @@ class BotDB:
         return result if result else 0  
 
 
-    def set_pays_since(self, user_id):
-        """Устанаваливаем с какой даты платит юзер"""  
-        result = self.cursor.execute('SELECT MIN("pays_since") FROM users')
-        pays_since = result.fetchone()[0]
+    def set_pays_since(self, user_id, pays_since=None):
+        """Устанаваливаем с какой даты платит юзер"""
+        if pays_since is None: 
+            result = self.cursor.execute('SELECT MIN("pays_since") FROM users')
+            pays_since = result.fetchone()[0]
         self.cursor.execute('UPDATE users SET "pays_since"=? WHERE "user_id"=?', (pays_since, user_id)) # +
         return self.conn.commit()
+
     def get_pay_periods(self):
         result = self.cursor.execute('SELECT user_id, username, pays_since FROM users')
         return result.fetchall()
