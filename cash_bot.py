@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 secret_token = os.getenv('TOKEN')
+admin_id = os.getenv('ADMIN_ID')
 
 
 
@@ -215,9 +216,7 @@ def get_all_payments(update=None, context=None):
 def main():
     updater = Updater(token=secret_token)
     bot = Bot(token=secret_token)
-    bot.send_message(291198651, 'Меня запустили снова, ура!')
-    message = get_all_payments()
-    # bot.send_message(291198651, message, parse_mode='MarkdownV2')
+    bot.send_message(admin_id, 'Меня запустили снова, ура!')
     
     updater.dispatcher.add_handler(CommandHandler('start', wake_up))
     updater.dispatcher.add_handler(CommandHandler('reset', reset_sum))
