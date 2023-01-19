@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 secret_token = os.getenv('TOKEN')
+admin_id = os.getenv('ADMIN_ID')
 
 
 
@@ -29,7 +30,7 @@ def wake_up(update, context):
     if not db.user_exists(user_id):
         db.add_user(user_id, username)  # дата расчётов по умолчанию дата регистрации
         reply_markup = ReplyKeyboardMarkup(keyboard=[['Поделить всё с момента регистрации первого участника'],['Считать мой долг с текущей даты']], resize_keyboard=True)
-        message = f'Привет, {name}! У ты тут не первый и возможно уже были платежи (сумму можно посмотреть в меню). Выбери что делать, пожалуйста!'
+        message = f'Привет, {name}! Возможно уже были платежи (сумму можно посмотреть в меню). Выбери что делать, пожалуйста!'
         send_message(context, chat.id, message, reply_markup=reply_markup)
         return
 
@@ -101,7 +102,7 @@ def calculation(update, context, amount=None):
 
 
 
-def how_much(update, context): # Cделать обновление
+def how_much(update, context):
     calculation(update, context)
 
 
@@ -191,6 +192,7 @@ def delete_user(update, context):
             context.bot.send_message(chat_id=chat_id, text='Кого кикнуть?☠️', reply_markup=reply_markup) # перенести в send message
         except Exception as error:
             logger.error(f'Не удалось отправить сообщение об удалении юзера. {error}')
+            return
     message = 'Я тебя не знаю! Если ты хочешь добавиться нажми /start' 
     send_message(context, chat_id, message)       
 
@@ -215,9 +217,7 @@ def get_all_payments(update=None, context=None):
 def main():
     updater = Updater(token=secret_token)
     bot = Bot(token=secret_token)
-    bot.send_message(291198651, 'Меня запустили снова, ура!')
-    message = get_all_payments()
-    # bot.send_message(291198651, message, parse_mode='MarkdownV2')
+    bot.send_message(admin_id, 'Меня запустили снова, ура!')
     
     updater.dispatcher.add_handler(CommandHandler('start', wake_up))
     updater.dispatcher.add_handler(CommandHandler('reset', reset_sum))
