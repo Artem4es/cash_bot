@@ -16,8 +16,8 @@ db = BotDB('telebot.db')
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-secret_token = os.getenv('TOKEN')
-admin_id = os.getenv('ADMIN_ID')
+SECRET_TOKEN = os.getenv('TOKEN')
+ADMIN_ID = os.getenv('ADMIN_ID')
 
 
 
@@ -101,10 +101,6 @@ def calculation(update, context, amount=None):
             message = f'👍Ты в плюсе на {owes} тугриков' 
         else:
             message = 'Вот это да, ты в нулину!🥳'
-        user_id = user_info[user][0]
-        send_message(context, user_id, message)
-        db.set_user_owes(user_id, owes)
-        message = 'Вот это да, ты в нулину!🥳'
         user_id = user_info[user][0]
         send_message(context, user_id, message)
         db.set_user_owes(user_id, owes)
@@ -229,9 +225,9 @@ def get_all_payments(update=None, context=None):
 
 
 def main():
-    updater = Updater(token=secret_token)
-    bot = Bot(token=secret_token)
-    bot.send_message(admin_id, 'Меня запустили снова, ура!')
+    updater = Updater(token=SECRET_TOKEN)
+    bot = Bot(token=SECRET_TOKEN)
+    bot.send_message(ADMIN_ID, 'Меня запустили снова, ура!')
     
     updater.dispatcher.add_handler(CommandHandler('start', wake_up))
     updater.dispatcher.add_handler(CommandHandler('reset', reset_sum))
@@ -263,10 +259,5 @@ if __name__ == '__main__':
     file_handler.setFormatter(formatter)
     logger.addHandler(terminal_handler)
     logger.addHandler(file_handler)
-    logging.basicConfig(
-        level=logging.DEBUG,
-        filename='program.log',
-        format='%(asctime)s, %(levelname)s, %(message)s, %(name)s',
-    )
 
     main()
