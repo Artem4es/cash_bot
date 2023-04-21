@@ -104,7 +104,7 @@ def calculation(update, context, amount=None):
         user_id = user_info[user][0]
         send_message(context, user_id, message)
         db.set_user_owes(user_id, owes)
-            message = 'Вот это да, ты в нулину!🥳'
+        message = 'Вот это да, ты в нулину!🥳'
         user_id = user_info[user][0]
         send_message(context, user_id, message)
         db.set_user_owes(user_id, owes)
