@@ -11,11 +11,9 @@ from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Bot
 
 from db import BotDB
-from models import User
 db = BotDB('telebot.db')
 
 logger = logging.getLogger(__name__)
-'justforfun'
 
 load_dotenv()
 secret_token = os.getenv('TOKEN')
@@ -38,10 +36,8 @@ def wake_up(update, context):
 
     text = f'Привет, {name}! Напиши циферками заплаченную сумму👋'
     send_message(context, chat.id, text, reply_markup=ReplyKeyboardRemove())
-    send_message(context, chat.id, text, reply_markup=ReplyKeyboardRemove())
 
 
-def calculation(update, context, amount=None):
 def calculation(update, context, amount=None):
     user_id = context._user_id_and_data[0]
     name = update.effective_chat.username
@@ -101,9 +97,7 @@ def calculation(update, context, amount=None):
     for user, owes in user_owes_dict.items():
         if owes < 0:
             message = f'С тебя {abs(owes)} тугриков🤸🏻‍♂️'
-            message = f'С тебя {abs(owes)} тугриков🤸🏻‍♂️'
         elif owes > 0:
-            message = f'👍Ты в плюсе на {owes} тугриков' 
             message = f'👍Ты в плюсе на {owes} тугриков' 
         else:
             message = 'Вот это да, ты в нулину!🥳'
@@ -141,9 +135,7 @@ def sum_recognition(update, context):
                 return
 
             elif message == 'Поделить всё с момента регистрации первого участника':
-            elif message == 'Поделить всё с момента регистрации первого участника':
                 db.set_pays_since(user_id)
-                return send_message(context, chat_id, 'Окей!Считаем от истоков)', reply_markup=ReplyKeyboardRemove())  # в будущем добавить дату с которой
                 return send_message(context, chat_id, 'Окей!Считаем от истоков)', reply_markup=ReplyKeyboardRemove())  # в будущем добавить дату с которой
 
             elif message == 'Считать мой долг с текущей даты':
@@ -165,13 +157,10 @@ def sum_recognition(update, context):
                     send_message(context=context, chat_id=user_id, text=message, reply_markup=ReplyKeyboardRemove())
                 return
             validated_message = re.sub(r'(, )|(,)|(. )', '.', message)
-            validated_message = re.sub(r'(, )|(,)|(. )', '.', message)
             amount = float(validated_message)
-            calculation(update, context, amount)
             calculation(update, context, amount)
         except:
             message = f'{name},это не число! По балде надаю 🤪!'
-            send_message(chat_id=chat_id, text=message, context=context, reply_markup=ReplyKeyboardRemove())
             send_message(chat_id=chat_id, text=message, context=context, reply_markup=ReplyKeyboardRemove())
             logger.error(f'Введено что-то не то: {update.message.text}.Либо не удалось отправить сообщение')
     else:
@@ -180,7 +169,7 @@ def sum_recognition(update, context):
         send_message(context, chat_id, message)
 
 
-def reset_sum(update, context):git
+def reset_sum(update, context):
     all_users = [user[0] for user in (db.get_users())]
     db.reset_sum()
     db.set_user_owes()
