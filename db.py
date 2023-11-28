@@ -124,7 +124,7 @@ class BotDB:
 
 
     def set_pays_since(self, user_id, pays_since=None):
-        """Устанаваливаем с какой даты платит юзер"""
+        """Устанавливаем с какой даты платит юзер"""
         if pays_since is None: 
             result = self.cursor.execute('SELECT MIN("pays_since") FROM users')
             pays_since = result.fetchone()[0]

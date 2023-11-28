@@ -1,1 +1,0 @@
-worker: python cash_bot.py
